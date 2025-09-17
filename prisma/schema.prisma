@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  otp        String?
+  otpExpiry  DateTime?
+  fullName   String?
+  mobile     String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  bankCards     BankCard[]
+  wallet        Wallet?
+  transactions  Transaction[]
+}
+
+model BankCard {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  accountNo  String
+  ifsc       String
+  payeeName  String
+  isSelected Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, accountNo])
+}
+
+model Wallet {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int      @unique
+
+  usdtAvailable  Float    @default(0)   // spendable balance
+  usdtDeposited  Float    @default(0)   // total deposits
+  usdtWithdrawn  Float    @default(0)   // total withdrawals
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+
+  depositId  String   @unique  // internal deposit reference (DEP-xxxxx)
+  txnId      String?  @unique  // blockchain TxId (can be null until user submits)
+  type       String   // "DEPOSIT", "WITHDRAW", "SELL", "BUY"
+  amount     Float
+  currency   String   @default("USDT")
+  network    String?  // TRC20, ERC20, etc.
+  address    String?  // deposit or withdraw address
+  status     String   @default("PENDING") // PENDING / SUCCESS / FAILED
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
