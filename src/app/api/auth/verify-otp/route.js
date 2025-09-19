@@ -4,11 +4,14 @@ import jwt from 'jsonwebtoken';
 export async function POST(req) {
   try {
     const { email, otp } = await req.json();
+
     if (!email || !otp) {
       return new Response(JSON.stringify({ error: 'Email and OTP are required' }), { status: 400 });
     }
 
+    // Find user in DB
     const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user || user.otp !== otp) {
       return new Response(JSON.stringify({ error: 'Invalid OTP' }), { status: 401 });
     }
@@ -18,12 +21,16 @@ export async function POST(req) {
     }
 
     if (!process.env.JWT_SECRET) {
-      console.error('JWT_SECRET is not defined');
+      console.error('JWT_SECRET not defined');
       return new Response(JSON.stringify({ error: 'Server misconfiguration' }), { status: 500 });
     }
 
-    // Generate JWT
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     // Clear OTP
     await prisma.user.update({
@@ -31,7 +38,7 @@ export async function POST(req) {
       data: { otp: null, otpExpiry: null },
     });
 
-    // ✅ Ensure wallet exists
+    // Ensure wallet exists
     let wallet = await prisma.wallet.findUnique({ where: { userId: user.id } });
     if (!wallet) {
       wallet = await prisma.wallet.create({
@@ -45,11 +52,16 @@ export async function POST(req) {
       console.log(`Wallet created for userId: ${user.id}`);
     }
 
-    // Decide redirect
-    const redirectTo = user.fullName && user.mobile ? '/home' : '/complete-profile';
+    // Redirect logic
+    const redirectTo = user.fullName && user.mobile ? '/admin/dashboard' : '/complete-profile';
 
     return new Response(
-      JSON.stringify({ token, redirectTo, message: 'OTP verified successfully', wallet }),
+      JSON.stringify({
+        token,
+        redirectTo,
+        message: 'OTP verified successfully',
+        wallet,
+      }),
       { status: 200 }
     );
   } catch (error) {
