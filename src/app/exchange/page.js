@@ -83,7 +83,7 @@ export default function Exchange() {
                   <div className="base-price">
                     <h4>99 <span>Base</span></h4>
                   </div>
-                  <p className="onepriceex">1 USDT = &#8377;99</p>
+                  <p className="onepriceex">1 USDT = &#8377;100</p>
 
                   <div className="pricerefBx">
                     <table width="100%">

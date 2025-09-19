@@ -1,8 +1,8 @@
-'use client'
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+"use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function HomePage() {
   const router = useRouter();
@@ -10,24 +10,25 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/auth/me', {
+        const res = await fetch("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Unauthorized');
+        if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
+        console.log(data);
         setUser(data.user);
       } catch (err) {
         console.error(err);
-        localStorage.removeItem('token');
-        router.push('/login');
+        localStorage.removeItem("token");
+        router.push("/login");
       } finally {
         setLoading(false);
       }
@@ -36,12 +37,9 @@ export default function HomePage() {
     fetchUser();
   }, [router]);
 
-
-
-
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('/login');
+    localStorage.removeItem("token");
+    router.push("/login");
   };
 
   if (loading) {
@@ -54,9 +52,7 @@ export default function HomePage() {
             width={50}
             height={50}
             priority
-            optimize
           />
-
         </div>
       </div>
     );
@@ -78,20 +74,21 @@ export default function HomePage() {
                 <div className="pic">
                   <img src="images/user-pic.png" />
                 </div>
-                <h3>{user.mobile || '+91 ******'}</h3>
+                <h3>{user?.mobile || "+91 ******"}</h3>
               </div>
+
               <div className="tab-inl">
                 <div className="bx">
                   <p>Total Amount($)</p>
-                  <h3>0</h3>
+                  <h3>{(user?.wallet?.total || 0).toFixed(2)}</h3>
                 </div>
                 <div className="bx">
                   <p>Available($)</p>
-                  <h3>0</h3>
+                  <h3>{(user?.wallet?.available || 0).toFixed(2)}</h3>
                 </div>
                 <div className="bx">
                   <p>Progressing($)</p>
-                  <h3>0</h3>
+                  <h3>{(user?.wallet?.progressing || 0).toFixed(2)}</h3>
                 </div>
               </div>
             </section>
@@ -113,9 +110,11 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="rights">
-                    <button className="btn">Withdraw</button>
-                  </div>
+                  <Link href="/sell-usdt">
+                    <div className="rights">
+                      <button className="btn">Withdraw</button>
+                    </div>
+                  </Link>
                 </div>
                 <div className="btm">
                   <button className="btn">To AngelX pro</button>
@@ -149,7 +148,7 @@ export default function HomePage() {
             <section className="section-2 reffer">
               <div className="rw">
                 <div className="bx">
-                  <Link href="/blank-page">
+                  <Link href="/referals">
                     <div className="image">
                       <h3>
                         <img src="images/ref-icon1.png" /> Referrals
@@ -161,7 +160,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <div className="bx">
-                  <Link href="/blank-page">
+                  <Link href="/history">
                     <div className="image">
                       <h3>
                         <img src="images/ref-icon2.png" /> Exchange history
@@ -173,7 +172,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <div className="bx">
-                  <Link href="/blank-page">
+                  <Link href="/statements">
                     <div className="image">
                       <h3>
                         <img src="images/ref-icon3.png" /> Statement
@@ -197,7 +196,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <div className="bx">
-                  <Link href="/blank-page">
+                  <Link href="/invite">
                     <div className="image">
                       <h3>
                         <img src="images/ref-icon5.png" /> Invited friends

@@ -1,25 +1,34 @@
-'use client';
-export const dynamic = 'force-dynamic';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+"use client";
+export const dynamic = "force-dynamic";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function DepositAmount() {
   const searchParams = useSearchParams();
-  const amount = searchParams.get('amount');
-  const network = searchParams.get('network');
-  const token = localStorage.getItem('token');
+  const amount = searchParams.get("amount");
+  const network = searchParams.get("network");
+  const token = localStorage.getItem("token");
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    const skipReminder = localStorage.getItem("skipFeeReminder");
+    if (!skipReminder) {
+      setShowModal(true);
+    }
+  }, []);
 
   // QR codes
   const qrCodes = {
-    TRC20: 'images/QR.jpg',
-    ERC20: 'images/QR-erc20.jpg',
+    TRC20: "images/QR.jpg",
+    ERC20: "images/QR-erc20.jpg",
   };
 
   // Deposit addresses
   const depositAddresses = {
-    TRC20: 'TgFt845DErl34jdf4545hsd34t845DErl34',
-    ERC20: '0x23AafDF8beF9234bd45Efdf9348dfE239a4d',
+    TRC20: "TgFt845DErl34jdf4545hsd34t845DErl34",
+    ERC20: "0x23AafDF8beF9234bd45Efdf9348dfE239a4d",
   };
 
   // Timer state
@@ -27,11 +36,11 @@ export default function DepositAmount() {
 
   useEffect(() => {
     const duration = 60 * 60 * 1000; // 1 hour in ms
-    let expiryTime = localStorage.getItem('depositExpiryTime');
+    let expiryTime = localStorage.getItem("depositExpiryTime");
 
     if (!expiryTime) {
       expiryTime = Date.now() + duration;
-      localStorage.setItem('depositExpiryTime', expiryTime.toString());
+      localStorage.setItem("depositExpiryTime", expiryTime.toString());
     } else {
       expiryTime = parseInt(expiryTime, 10);
     }
@@ -41,7 +50,7 @@ export default function DepositAmount() {
       setTimeLeft(remaining > 0 ? remaining : 0);
 
       if (remaining <= 0) {
-        localStorage.removeItem('depositExpiryTime');
+        localStorage.removeItem("depositExpiryTime");
       }
     };
 
@@ -52,36 +61,36 @@ export default function DepositAmount() {
 
   // Format timer
   const formatTime = (seconds) => {
-    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
+    const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
     return { h, m, s };
   };
 
   const { h, m, s } = formatTime(timeLeft);
 
   // Persistent Txid input
-  const [txid, setTxid] = useState('');
+  const [txid, setTxid] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem('txid');
+    const saved = localStorage.getItem("txid");
     if (saved) setTxid(saved);
   }, []);
 
   const handleTxidChange = (e) => {
     setTxid(e.target.value);
-    localStorage.setItem('txid', e.target.value);
+    localStorage.setItem("txid", e.target.value);
   };
 
   // Generate deposit ID and create time
-  const [depositId, setDepositId] = useState('');
-  const [createTime, setCreateTime] = useState('');
+  const [depositId, setDepositId] = useState("");
+  const [createTime, setCreateTime] = useState("");
 
   useEffect(() => {
     const id =
-      'DEP-' +
+      "DEP-" +
       Date.now().toString(36) +
-      '-' +
+      "-" +
       Math.random().toString(36).slice(2, 8);
     setDepositId(id);
 
@@ -101,32 +110,54 @@ export default function DepositAmount() {
     };
 
     try {
-      const res = await fetch('/api/admin/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${token}`},
+      const res = await fetch("/api/admin/deposit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert('Deposit details submitted successfully!');
-        localStorage.removeItem('txid');
-        setTxid('');
+        setMessage({ type: "success", text: "Deposit submitted ✅" });
+
+        // reset
+        localStorage.removeItem("txid");
+        setTxid("");
+
+        // redirect after 2 sec
+        setTimeout(() => {
+          window.location.href = "/exchange";
+        }, 1000);
       } else {
-        alert(data.error || 'Failed to submit deposit details');
+        setMessage({
+          type: "error",
+          text: data.error || "Something went wrong ❌",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to submit deposit details');
+      setMessage({
+        type: "error",
+        text: "Something went wrong ❌", // don’t use `data` here since it won’t exist
+      });
     }
   };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <div>
       <main>
         <div className="page-wrappers no-empty-page deposit-amount-page">
-
           <header className="header">
             <div className="brdc">
               <div className="back-btn">
@@ -156,17 +187,35 @@ export default function DepositAmount() {
               {/* Timer */}
               <div className="rem-time">
                 <span className="num">{h[0]}</span>
-                <span className="num">{h[1]}</span> <span className="sep">:</span>
+                <span className="num">{h[1]}</span>{" "}
+                <span className="sep">:</span>
                 <span className="num">{m[0]}</span>
-                <span className="num">{m[1]}</span> <span className="sep">:</span>
+                <span className="num">{m[1]}</span>{" "}
+                <span className="sep">:</span>
                 <span className="num">{s[0]}</span>
                 <span className="num">{s[1]}</span> remaining
               </div>
 
+              {message && (
+                <div
+                  style={{
+                    backgroundColor:
+                      message.type === "success" ? "#4caf50" : "#f44336",
+                    color: "white",
+                    padding: "10px",
+                    marginBottom: "12px",
+                    borderRadius: "6px",
+                    textAlign: "center",
+                  }}
+                >
+                  {message.text}
+                </div>
+              )}
+
               <p>
                 <b>
-                  If have transaction fee, don't forget to add it. The transfer amount
-                  must match the deposit amount.
+                  If have transaction fee, don't forget to add it. The transfer
+                  amount must match the deposit amount.
                 </b>
               </p>
 
@@ -201,18 +250,19 @@ export default function DepositAmount() {
 
               <p style={{ textAlign: "left", paddingTop: 20, opacity: ".4" }}>
                 <b>
-                  Your deposit USDT will be immediately to your wallet once enter Txid
+                  Your deposit USDT will be immediately to your wallet once
+                  enter Txid
                 </b>
               </p>
             </section>
 
             <section className="section-2 inner-space">
               <div className="inside">
-
                 <div className="rw">
                   <p className="title">Deposit Amount</p>
                   <div className="amt">
-                    <img src="images/uic.png" className="icon" /> <h3>{amount}</h3>
+                    <img src="images/uic.png" className="icon" />{" "}
+                    <h3>{amount}</h3>
                   </div>
                 </div>
 
@@ -229,9 +279,10 @@ export default function DepositAmount() {
                 <div className="warning" style={{ margin: "7px 0" }}>
                   <div className="inside">
                     <img src="images/warn.png" className="icon" />A Only support{" "}
-                    <span className="red">{network}-USDT</span>, Any losses caused by your
-                    improper operation will be borne by yourself. Please operate with
-                    caution and double-check the recharge address carefully
+                    <span className="red">{network}-USDT</span>, Any losses
+                    caused by your improper operation will be borne by yourself.
+                    Please operate with caution and double-check the recharge
+                    address carefully
                   </div>
                 </div>
 
@@ -249,9 +300,13 @@ export default function DepositAmount() {
                   <p className="title">Network</p>
                   <div className="amt no-weight">
                     <img
-                      src={network === 'TRC20' ? "images/tb-ic1.png" : "images/tb-ic2.png"}
+                      src={
+                        network === "TRC20"
+                          ? "images/tb-ic1.png"
+                          : "images/tb-ic2.png"
+                      }
                       className="icon"
-                    /> 
+                    />
                     USDT-{network}
                   </div>
                 </div>
@@ -277,6 +332,88 @@ export default function DepositAmount() {
           </div>
         </div>
       </main>
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 9999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              padding: "24px",
+              maxWidth: "360px",
+              textAlign: "center",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              fontFamily: "sans-serif",
+            }}
+          >
+            <p
+              style={{ fontSize: "14px", color: "#111", marginBottom: "16px" }}
+            >
+              Due to transaction fees charged by the exchange when transferring
+              funds, please try to ensure that the deposited amount and the
+              amount received are as close as possible.
+            </p>
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#111",
+                fontWeight: "bold",
+                marginBottom: "24px",
+              }}
+            >
+              For example, if the transaction fee for the exchange transfer is 1
+              USDT and the deposited amount is 100.23 USDT, the transfer amount
+              to the exchange should be 101.23 USDT.
+            </p>
+
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                backgroundColor: "#000",
+                color: "#fff",
+                border: "none",
+                borderRadius: "999px",
+                padding: "10px 24px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginBottom: "12px",
+              }}
+            >
+              Ok
+            </button>
+
+            <div style={{ fontSize: "13px", color: "#111" }}>
+              <label style={{ cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      localStorage.setItem("skipFeeReminder", "true");
+                    } else {
+                      localStorage.removeItem("skipFeeReminder");
+                    }
+                  }}
+                  style={{ marginRight: "6px" }}
+                />
+                I already know, next time don't remind.
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,9 +5,9 @@ import Link from 'next/link';
 export default function USDTDeposit() {
   const [activeTab, setActiveTab] = useState('TRC20');
   const [amount, setAmount] = useState('');
-   const [walletBalance, setWalletBalance] = useState(0); // <-- add this
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [error, setError] = useState(''); // <-- add error state
 
-  // Fetch wallet balance on mount
   useEffect(() => {
     const fetchWallet = async () => {
       const token = localStorage.getItem('token');
@@ -22,7 +22,7 @@ export default function USDTDeposit() {
           const data = await res.json();
           setWalletBalance(data.usdtAvailable || 0);
         } else if (res.status === 401) {
-          window.location.href = '/login'; // redirect if unauthorized
+          window.location.href = '/login';
         }
       } catch (err) {
         console.error('Failed to fetch wallet:', err);
@@ -31,6 +31,21 @@ export default function USDTDeposit() {
 
     fetchWallet();
   }, []);
+
+  // Handle input change
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    setAmount(value);
+
+    if (value && parseFloat(value) < 100) {
+      setError('Minimum deposit amount is 100 USDT');
+    } else {
+      setError('');
+    }
+  };
+
+  // Disable deposit if amount < 100
+  const isDepositDisabled = !amount || parseFloat(amount) < 100;
 
   return (
     <div>
@@ -106,7 +121,7 @@ export default function USDTDeposit() {
                       placeholder="Please enter the amount"
                       name="amt"
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={handleAmountChange} // <-- updated handler
                       style={{
                         width: "100%",
                         paddingRight: "50px",
@@ -132,6 +147,8 @@ export default function USDTDeposit() {
                       <img src="images/uic.png" className="icon" /> USDT
                     </div>
 
+                   
+
                     <style jsx>{`
                       input::-webkit-outer-spin-button,
                       input::-webkit-inner-spin-button {
@@ -148,15 +165,21 @@ export default function USDTDeposit() {
                     `}</style>
                   </div>
                 </div>
+                 {error && (
+                      <p style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                        {error}
+                      </p>
+                    )}
 
-                {/* DEPOSIT BUTTON WITH QUERY PARAMS */}
-                 <p className="title">Available($) {walletBalance}</p>
+                {/* DEPOSIT BUTTON */}
+                <p className="title">Available($) {walletBalance}</p>
                 <Link
-                  href={{
+                  href={isDepositDisabled ? '#' : {
                     pathname: "/deposit-amount",
                     query: { amount, network: activeTab },
                   }}
                   className="button-style"
+                  onClick={(e) => isDepositDisabled && e.preventDefault()} // prevent if invalid
                 >
                   Deposit
                 </Link>

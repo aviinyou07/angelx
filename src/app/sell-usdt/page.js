@@ -20,23 +20,22 @@ export default function AddBank() {
   const [selectedBankId, setSelectedBankId] = useState(initialBank?.id || null);
   const [loading, setLoading] = useState(!initialBank);
   const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); // ✅ Added success state
   const [amount, setAmount] = useState("");
   const [balance, setBalance] = useState(0);
-  const rate = 96;
+  const rate = 100;
 
   const selectedBank = banks.find((b) => b.id === selectedBankId);
 
-  // ✅ Auth guard: redirect immediately if no token
+  // ✅ Auth guard
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      router.replace("/login");
-    }
+    if (!token) router.replace("/login");
   }, [router]);
 
   useEffect(() => {
     if (!initialBank) fetchBanks();
-    fetchBalance(); 
+    fetchBalance();
   }, []);
 
   const fetchBanks = async () => {
@@ -54,7 +53,7 @@ export default function AddBank() {
       });
 
       if (res.status === 401) {
-        router.replace("/login"); // redirect if token invalid
+        router.replace("/login");
         return;
       }
 
@@ -94,61 +93,60 @@ export default function AddBank() {
     }
   };
 
-const handleConfirm = async () => {
-  const amt = parseFloat(amount);
+  const handleConfirm = async () => {
+    const amt = parseFloat(amount);
 
-  if (!amount || isNaN(amt)) {
-    setMessage("Please enter an amount.");
-    return;
-  }
-  if (500 > amt) {
-    setMessage("❌ Minimum 500$, please add funds to complete the transaction.");
-    return;
-  }
-  if (!selectedBank) {
-    setMessage("Please select a bank account.");
-    return;
-  }
-
-  setMessage("");
-
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch("/api/admin/selling-request", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ bank: selectedBank, amount: amt }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Selling request sent for manual confirmation ✅");
-      setAmount(""); // reset input
-    } else {
-      setMessage(data.error || "Failed to send selling request");
+    if (!amount || isNaN(amt)) {
+      setMessage("Please enter an amount.");
+      setSuccessMessage(""); // clear success
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    setMessage("Error sending selling request");
-  }
-};
+    if (500 > amt) {
+      setMessage("❌ Minimum 500$, please add funds to complete the transaction.");
+      setSuccessMessage("");
+      return;
+    }
+    if (!selectedBank) {
+      setMessage("Please select a bank account.");
+      setSuccessMessage("");
+      return;
+    }
 
+    setMessage("");
+    setSuccessMessage(""); // clear previous success
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/admin/selling-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ bank: selectedBank, amount: amt }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSuccessMessage("✅ Selling request sent for the confirmation!. please wait....");
+        setAmount(""); // reset input
+        setMessage("");
+        setTimeout(() => setSuccessMessage(""), 5000); // hide after 5s
+      } else {
+        setMessage(data.error || "Failed to send selling request");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Error sending selling request");
+    }
+  };
 
   if (loading) {
     return (
       <div className="page-wrappers">
         <div className="loader" style={{ textAlign: "center", marginTop: "40px" }}>
-          <Image
-            src="/images/loading.webp"
-            alt="loader"
-            width={50}
-            height={50}
-            priority
-          />
+          <Image src="/images/loading.webp" alt="loader" width={50} height={50} priority />
         </div>
       </div>
     );
@@ -299,7 +297,12 @@ const handleConfirm = async () => {
                     `}</style>
                   </div>
                 </div>
-                {message && <p className="error" style={{ padding:"10px", fontSize: "12px", color: "red", fontWeight: "500", }}>{message}</p>}
+
+                {/* ❌ Error message */}
+                {message && <p className="error" style={{ padding:"10px", fontSize: "12px", color: "red", fontWeight: "500" }}>{message}</p>}
+
+                {/* ✅ Success message */}
+                {successMessage && <p className="success" style={{ padding:"10px", fontSize: "12px", color: "green", fontWeight: "500" }}>{successMessage}</p>}
 
                 {/* EXTRA INFO */}
                 <div className="dflex avail">
