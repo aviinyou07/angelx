@@ -12,11 +12,9 @@ export default function LoginPage() {
     const token = localStorage.getItem('token');
 
     if (token) {
-      // Immediately redirect if logged in
-      router.replace('/home');
+      router.replace('/home'); // redirect if logged in
     } else {
-      // Only render login page if no token
-      setLoading(false);  // ✅ FIX
+      setLoading(false); // show login page if not
     }
   }, [router]);
 
@@ -25,7 +23,7 @@ export default function LoginPage() {
       <div className="page-wrappers">
         <div className="loader">
           <Image
-            src="/images/loading.webp"
+            src="/images/loading.webp" // ✅ Leading / ensures Vercel finds it
             alt="loader"
             width={50}
             height={50}
@@ -43,7 +41,11 @@ export default function LoginPage() {
           <div className="page-wrapperss page-wrapper-ex page-wrapper-login">
             <section className="section-1">
               <div className="image">
-                <img src="images/login-img.png" style={{ width: "100%" }} />
+                <img
+                  src="/images/login-img.png" // ✅ Added leading /
+                  style={{ width: "100%" }}
+                  alt="Login Illustration"
+                />
               </div>
             </section>
             <section className="section-3">
