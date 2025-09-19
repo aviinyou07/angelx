@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -8,6 +8,21 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // ✅ Auto redirect if already logged in (cookie exists)
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const res = await fetch("/api/admin/check-session");
+        if (res.ok) {
+          router.replace("/admin/dashboard");
+        }
+      } catch (err) {
+        // no cookie, do nothing
+      }
+    };
+    checkAdmin();
+  }, [router]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,9 +39,8 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // server sets HTTP-only cookie, no need to store token in localStorage
-        localStorage.setItem("adminEmail", email);
-        router.push("/admin/dashboard");
+        // Cookie is set by backend, just redirect
+        router.replace("/admin/dashboard");
       } else {
         setError(data.error || "Invalid credentials");
       }
@@ -38,7 +52,7 @@ export default function AdminLoginPage() {
     }
   };
 
-  // Inline CSS
+  // Inline styles (unchanged)
   const styles = {
     container: { minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f3f4f6" },
     card: { backgroundColor: "#fff", padding: "2rem", borderRadius: "1rem", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", width: "100%", maxWidth: "400px" },
@@ -53,9 +67,25 @@ export default function AdminLoginPage() {
       <div style={styles.card}>
         <h2 style={styles.title}>Admin Login</h2>
         <form onSubmit={handleLogin}>
-          <input type="email" placeholder="Email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit" style={styles.button} disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
+          <input
+            type="email"
+            placeholder="Email"
+            style={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            style={styles.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
         {error && <p style={styles.error}>{error}</p>}
       </div>

@@ -3,28 +3,48 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminDepositsPage from "../deposits/page";
 import AdminSellingRequests from "../Sellings/page";
-import Users from "../Users/Page"
+import Users from "../Users/Page";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [activePage, setActivePage] = useState("dashboard"); 
-  const adminEmail = typeof window !== "undefined" ? localStorage.getItem("adminEmail") || "Admin" : "Admin";
+  const [activePage, setActivePage] = useState("dashboard");
+  const [adminEmail, setAdminEmail] = useState("Admin");
 
+  // ✅ Check cookie-based session
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) router.push("/admin/login");
-    else setLoading(false);
+    const checkSession = async () => {
+      try {
+        const res = await fetch("/api/admin/check-session");
+        if (!res.ok) {
+          router.replace("/admin/login");
+          return;
+        }
+        const data = await res.json();
+        setAdminEmail(data.email || "Admin");
+        setLoading(false);
+      } catch (err) {
+        router.replace("/admin/login");
+      }
+    };
+    checkSession();
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminEmail");
-    router.replace("/admin/login");
+  // ✅ Logout handler
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      router.replace("/admin/login");
+    }
   };
 
-  if (loading) return <p style={{ textAlign: "center", marginTop: "5rem" }}>Loading...</p>;
+  if (loading)
+    return <p style={{ textAlign: "center", marginTop: "5rem" }}>Loading...</p>;
 
+  // --- Styles ---
   const containerStyle = { display: "flex", minHeight: "100vh", backgroundColor: "#f3f4f6" };
   const sidebarStyle = { width: "220px", backgroundColor: "#1f2937", color: "#fff", display: "flex", flexDirection: "column", padding: "1rem" };
   const sidebarItemStyle = (active) => ({
@@ -40,6 +60,7 @@ export default function AdminDashboard() {
   const logoutBtnStyle = { padding: "0.5rem 1rem", backgroundColor: "#ef4444", color: "#fff", border: "none", borderRadius: "0.5rem", cursor: "pointer" };
   const cardStyle = { backgroundColor: "#fff", padding: "1.5rem", borderRadius: "1rem", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", marginBottom: "1rem" };
 
+  // --- Render content based on activePage ---
   const renderContent = () => {
     if (activePage === "dashboard") {
       return (
@@ -55,16 +76,14 @@ export default function AdminDashboard() {
         </>
       );
     }
-
     if (activePage === "users") {
       return (
         <div style={cardStyle}>
           <h3>Users</h3>
-          <Users/>
+          <Users />
         </div>
       );
     }
-
     if (activePage === "settings") {
       return (
         <div style={cardStyle}>
