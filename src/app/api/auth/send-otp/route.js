@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/mailer';
 import crypto from 'crypto';
 
-const generateOtp = () => crypto.randomInt(1000, 9999).toString(); // more secure 4-digit OTP
+const generateOtp = () => crypto.randomInt(1000, 9999).toString();
 
 export async function POST(req) {
   try {
@@ -14,7 +14,7 @@ export async function POST(req) {
     const otp = generateOtp();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 min expiry
 
-    // Upsert user
+    // Upsert user safely for serverless
     await prisma.user.upsert({
       where: { email },
       update: { otp, otpExpiry },
@@ -33,4 +33,9 @@ export async function POST(req) {
     console.error('Error sending OTP:', error);
     return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
   }
+}
+
+// Optional: prevent 405 for GET (helpful for debugging)
+export async function GET() {
+  return new Response(JSON.stringify({ message: "Use POST to send OTP" }), { status: 200 });
 }
