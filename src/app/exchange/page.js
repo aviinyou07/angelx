@@ -81,7 +81,7 @@ export default function Exchange() {
                 </div>
                 <div className="reff-price">
                   <div className="base-price">
-                    <h4>99 <span>Base</span></h4>
+                    <h4>100 <span>Base</span></h4>
                   </div>
                   <p className="onepriceex">1 USDT = &#8377;100</p>
 
@@ -96,19 +96,19 @@ export default function Exchange() {
                       <tbody>
                         <tr>
                           <td>&gt;=1041 and &lt;2000</td>
-                          <td>99+ <span className="red">0.50</span></td>
+                          <td>100+ <span className="red">0.50</span></td>
                         </tr>
                         <tr>
                           <td>&gt;=1041 and &lt;2000</td>
-                          <td>99+ <span className="red">0.50</span></td>
+                          <td>100+ <span className="red">0.50</span></td>
                         </tr>
                         <tr>
                           <td>&gt;=1041 and &lt;2000</td>
-                          <td>99+ <span className="red">0.50</span></td>
+                          <td>100+ <span className="red">0.50</span></td>
                         </tr>
                         <tr>
                           <td>&gt;=5.1041</td>
-                          <td>99+ <span className="red">0.50</span></td>
+                          <td>100+ <span className="red">0.50</span></td>
                         </tr>
                         <tr>
                           <td colSpan="2"><a href="#">What is tiered price policy?</a></td>
@@ -206,7 +206,7 @@ export default function Exchange() {
                   <div className="text">
                     Avg <span className="b">91.88</span> <span className="rs">RS</span>
                   </div>
-                  <div className="small">1USDT = ₹99.88</div>
+                  <div className="small">1USDT = ₹100.88</div>
                   <div className="rw">
                     Min <span className="black">91.46RS</span>
                   </div>

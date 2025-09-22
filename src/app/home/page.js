@@ -8,6 +8,13 @@ export default function HomePage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+   const [today, setToday] = useState("");
+
+  useEffect(() => {
+    const now = new Date();
+    const options = { day: "numeric", month: "long" }; 
+    setToday(now.toLocaleDateString("en-GB", options));
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -140,7 +147,7 @@ export default function HomePage() {
                 </div>
                 <div className="rights">
                   <button className="btn">Details</button>
-                  <p>24 June</p>
+                   <p>{today}</p>
                 </div>
               </div>
             </section>
