@@ -142,10 +142,11 @@ export default function DepositAmount() {
       console.error(err);
       setMessage({
         type: "error",
-        text: "Something went wrong ❌", // don’t use `data` here since it won’t exist
+        text: "Something went wrong ❌",
       });
     }
   };
+
 
   useEffect(() => {
     if (message) {
@@ -153,6 +154,17 @@ export default function DepositAmount() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setMessage({ type: "success", text: "Copied to clipboard ✅" });
+      })
+      .catch(() => {
+        setMessage({ type: "error", text: "Failed to copy ❌" });
+      });
+  };
+
 
   return (
     <div>
@@ -195,22 +207,6 @@ export default function DepositAmount() {
                 <span className="num">{s[0]}</span>
                 <span className="num">{s[1]}</span> remaining
               </div>
-
-              {message && (
-                <div
-                  style={{
-                    backgroundColor:
-                      message.type === "success" ? "#4caf50" : "#f44336",
-                    color: "white",
-                    padding: "10px",
-                    marginBottom: "12px",
-                    borderRadius: "6px",
-                    textAlign: "center",
-                  }}
-                >
-                  {message.text}
-                </div>
-              )}
 
               <p>
                 <b>
@@ -256,6 +252,22 @@ export default function DepositAmount() {
               </p>
             </section>
 
+              {message && (
+                <div
+                  style={{
+                    backgroundColor:
+                      message.type === "success" ? "#4caf50" : "#f44336",
+                    color: "white",
+                    padding: "10px",
+                    marginBottom: "12px",
+                    borderRadius: "6px",
+                    textAlign: "center",
+                  }}
+                >
+                  {message.text}
+                </div>
+              )}
+
             <section className="section-2 inner-space">
               <div className="inside">
                 <div className="rw">
@@ -270,150 +282,159 @@ export default function DepositAmount() {
                   <p className="title">Deposit Address</p>
                   <div className="address">
                     {depositAddresses[network]}
-                    <span className="copy">
+                    <span
+                      className="copy"
+                      onClick={() => handleCopy(depositAddresses[network])}
+                      style={{ cursor: "pointer" }}
+                    >
                       <img src="images/copy.png" className="icon" />
                     </span>
                   </div>
                 </div>
 
-                <div className="warning" style={{ margin: "7px 0" }}>
-                  <div className="inside">
-                    <img src="images/warn.png" className="icon" />A Only support{" "}
-                    <span className="red">{network}-USDT</span>, Any losses
-                    caused by your improper operation will be borne by yourself.
-                    Please operate with caution and double-check the recharge
-                    address carefully
-                  </div>
-                </div>
-
-                <div className="rw">
-                  <p className="title">Deposit ID</p>
-                  <div className="address">
-                    {depositId}
-                    <span className="copy">
-                      <img src="images/copy.png" className="icon" />
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rw">
-                  <p className="title">Network</p>
-                  <div className="amt no-weight">
-                    <img
-                      src={
-                        network === "TRC20"
-                          ? "images/tb-ic1.png"
-                          : "images/tb-ic2.png"
-                      }
-                      className="icon"
-                    />
-                    USDT-{network}
-                  </div>
-                </div>
-
-                <div className="rw">
-                  <p className="title">Create Time</p>
-                  <div className="amt no-weight">{createTime}</div>
-                </div>
-
-                <div className="rw">
-                  <p className="title">Remark</p>
-                </div>
-
-                <div className="rw nobrd anc">
-                  <p className="title">
-                    <a href="#">
-                      <b>.</b> {network}-USDT only
-                    </a>
-                  </p>
+              <div className="warning" style={{ margin: "7px 0" }}>
+                <div className="inside">
+                  <img src="images/warn.png" className="icon" />A Only support{" "}
+                  <span className="red">{network}-USDT</span>, Any losses
+                  caused by your improper operation will be borne by yourself.
+                  Please operate with caution and double-check the recharge
+                  address carefully
                 </div>
               </div>
-            </section>
+
+              <div className="rw">
+                <p className="title">Deposit ID</p>
+                <div className="address">
+                  {depositId}
+                  <span
+                    className="copy"
+                    onClick={() => handleCopy(depositId)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img src="images/copy.png" className="icon" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="rw">
+                <p className="title">Network</p>
+                <div className="amt no-weight">
+                  <img
+                    src={
+                      network === "TRC20"
+                        ? "images/tb-ic1.png"
+                        : "images/tb-ic2.png"
+                    }
+                    className="icon"
+                  />
+                  USDT-{network}
+                </div>
+              </div>
+
+              <div className="rw">
+                <p className="title">Create Time</p>
+                <div className="amt no-weight">{createTime}</div>
+              </div>
+
+              <div className="rw">
+                <p className="title">Remark</p>
+              </div>
+
+              <div className="rw nobrd anc">
+                <p className="title">
+                  <a href="#">
+                    <b>.</b> {network}-USDT only
+                  </a>
+                </p>
+              </div>
           </div>
-        </div>
-      </main>
-      {showModal && (
+        </section>
+    </div>
+        </div >
+      </main >
+    { showModal && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          zIndex: 9999,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            backgroundColor: "#fff",
+            borderRadius: "12px",
+            padding: "24px",
+            maxWidth: "360px",
+            textAlign: "center",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            fontFamily: "sans-serif",
           }}
         >
-          <div
+          <p
+            style={{ fontSize: "14px", color: "#111", marginBottom: "16px" }}
+          >
+            Due to transaction fees charged by the exchange when transferring
+            funds, please try to ensure that the deposited amount and the
+            amount received are as close as possible.
+          </p>
+          <p
             style={{
-              backgroundColor: "#fff",
-              borderRadius: "12px",
-              padding: "24px",
-              maxWidth: "360px",
-              textAlign: "center",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-              fontFamily: "sans-serif",
+              fontSize: "14px",
+              color: "#111",
+              fontWeight: "bold",
+              marginBottom: "24px",
             }}
           >
-            <p
-              style={{ fontSize: "14px", color: "#111", marginBottom: "16px" }}
-            >
-              Due to transaction fees charged by the exchange when transferring
-              funds, please try to ensure that the deposited amount and the
-              amount received are as close as possible.
-            </p>
-            <p
-              style={{
-                fontSize: "14px",
-                color: "#111",
-                fontWeight: "bold",
-                marginBottom: "24px",
-              }}
-            >
-              For example, if the transaction fee for the exchange transfer is 1
-              USDT and the deposited amount is 100.23 USDT, the transfer amount
-              to the exchange should be 101.23 USDT.
-            </p>
+            For example, if the transaction fee for the exchange transfer is 1
+            USDT and the deposited amount is 100.23 USDT, the transfer amount
+            to the exchange should be 101.23 USDT.
+          </p>
 
-            <button
-              onClick={() => setShowModal(false)}
-              style={{
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "none",
-                borderRadius: "999px",
-                padding: "10px 24px",
-                fontSize: "14px",
-                fontWeight: "bold",
-                cursor: "pointer",
-                marginBottom: "12px",
-              }}
-            >
-              Ok
-            </button>
+          <button
+            onClick={() => setShowModal(false)}
+            style={{
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "none",
+              borderRadius: "999px",
+              padding: "10px 24px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              marginBottom: "12px",
+            }}
+          >
+            Ok
+          </button>
 
-            <div style={{ fontSize: "13px", color: "#111" }}>
-              <label style={{ cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      localStorage.setItem("skipFeeReminder", "true");
-                    } else {
-                      localStorage.removeItem("skipFeeReminder");
-                    }
-                  }}
-                  style={{ marginRight: "6px" }}
-                />
-                I already know, next time don't remind.
-              </label>
-            </div>
+          <div style={{ fontSize: "13px", color: "#111" }}>
+            <label style={{ cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    localStorage.setItem("skipFeeReminder", "true");
+                  } else {
+                    localStorage.removeItem("skipFeeReminder");
+                  }
+                }}
+                style={{ marginRight: "6px" }}
+              />
+              I already know, next time don't remind.
+            </label>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    )
+}
+    </div >
   );
 }
