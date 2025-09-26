@@ -22,6 +22,11 @@ export default function DemoPage() {
       </div>
       <h3>Referals</h3>
     </div>
+    <section className="section-1a banner-img">
+      <div className="image">
+        <img src="images/ref-img.jpg" style={{"width":"100%"}} />
+      </div>
+    </section>
     <section className="section-1">
       <div className="image">
         <img src="images/empty.jpg" />

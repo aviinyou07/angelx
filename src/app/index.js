@@ -46,13 +46,14 @@ export default function Index() {
                 
             </div>
             <div className="right">
+                <a href="https://wa.me/+918930230236?text=Hello%2C%20World!">
                 <Image                
                 src="/images/customer-care.png"
                 alt="customer"
                 width={20}
                 height={20}
                 priority
-                />
+                /></a>
             </div>
         </header>
 
@@ -137,10 +138,10 @@ export default function Index() {
   <section className="section-3">
     <div className="image">
         <Image                
-        src="/images/calculations1.png"
+        src="/images/anglex-img.jpg" 
         alt=""
-        width={254}
-        height={370}
+        width={329}
+        height={380}
         priority
         />      
     </div>

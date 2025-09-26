@@ -264,6 +264,23 @@ section.section-4 table td:last-child {
     font-size: 13px;
     color: #777;
 }
+section.section-1a.banner-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.informate {
+    text-align: center;
+    padding-top: 50px;
+}
+
+.informate h3 {
+    padding-bottom: 10px;
+}
+
+.informate p {
+    color: #333;
+}
 
 .page-wrapper-ex .price-calc .priceref p span.ref {
     color: orange;
@@ -277,8 +294,8 @@ section.section-4 table td:last-child {
     font-size: 45px;
     font-family: corsicasx6;
     font-weight: 600;
-    font-family: "Monda", sans-serif;
-	letter-spacing: -5px;
+    font-family: "Roboto", sans-serif;
+	letter-spacing: -3px;
 	line-height: 40px;
 	padding: 15px 0 0px 0;
 }
@@ -1463,8 +1480,9 @@ section.section-3 .image {
 }
 
 section.section-3 .image img {
-    max-width: 75%;
+    max-width: 80%;
     margin: auto;
+    height: auto;
 }
 
 section.section-3 p.title {
@@ -2680,3 +2698,22 @@ footer.footer .bx a.tb .icon img.act {
     display: none;
 }
 
+.pricerefBx.pricerefBx-01 {
+    padding: 10px;
+    background: #272727;
+}
+
+.pricerefBx.pricerefBx-01 h4 {
+    text-align: center;
+    color: #fff;
+    padding: 0px 0 10px 0;
+    font-size: 15px;
+}
+
+.page-wrapper-ex  .pricerefBx.pricerefBx-01 table th {
+    background: #ffd016;
+    font-weight: normal;
+    padding: 7px 10px 7px 10px;
+    color: #000;
+    font-size: 14px;
+}

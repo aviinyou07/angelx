@@ -71,7 +71,9 @@ export default function Exchange() {
               <img src="images/w-logo.jpg" />
             </div>
             <div className="right">
+              <a href="https://wa.me/+918930230236?text=Hello%2C%20World!">
               <img src="images/customer-care.png" />
+              </a>
             </div>
           </header>
 
@@ -124,27 +126,27 @@ export default function Exchange() {
                       </thead>
                       <tbody>
                         <tr>
-                          <td>&gt;=1041 and &lt;2000</td>
+                          <td>&gt;=980.4 and &lt;1960.79</td>
                           <td>
-                            102+ <span className="red">0.50</span>
+                            102+ <span className="red">0.25</span>
                           </td>
                         </tr>
                         <tr>
-                          <td>&gt;=1041 and &lt;2000</td>
+                          <td>&gt;=1960.79 and &lt;2941.18</td>
                           <td>
-                            102+ <span className="red">0.50</span>
+                            102+ <span className="red">0.5</span>
                           </td>
                         </tr>
                         <tr>
-                          <td>&gt;=1041 and &lt;2000</td>
+                          <td>&gt;=2941.18 and &lt;4901.97</td>
                           <td>
-                            102+ <span className="red">0.50</span>
+                            102+ <span className="red">1</span>
                           </td>
                         </tr>
                         <tr>
-                          <td>&gt;=5.1041</td>
+                          <td>&gt;=4901.97</td>
                           <td>
-                            102+ <span className="red">0.50</span>
+                            102+ <span className="red">1.5</span>
                           </td>
                         </tr>
                         <tr>
@@ -191,7 +193,7 @@ export default function Exchange() {
                   </div>
 
                   <div className="bx">
-                    <Link href="#">
+                    <Link href="/invite">
                       <div className="icon">
                         <img src="images/envlope.png" />
                       </div>
@@ -319,7 +321,7 @@ export default function Exchange() {
                 </div>
                 <div className="bx">
                   <div className="image">
-                    <img src="images/Pro.png" style={{}} />{" "}
+                    <img src="images/pro.png" style={{}} />{" "}
                     <h3>Reliable Security</h3>
                   </div>
                   <div className="info">
